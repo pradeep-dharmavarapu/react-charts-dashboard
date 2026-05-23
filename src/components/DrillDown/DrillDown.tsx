@@ -77,7 +77,7 @@ export function DrillDown({ data, dimension, onDimensionChange }: DrillDownProps
               <p>Current quarter versus prior quarter and prior year.</p>
             </div>
           </div>
-          <div className="table-wrap">
+          <div className="table-wrap compact-table">
             <table>
               <thead>
                 <tr>

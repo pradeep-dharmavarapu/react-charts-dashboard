@@ -29,7 +29,7 @@ export function TrendLineChart({ data, symbol }: TrendLineChartProps) {
         <Line
           type="monotone"
           dataKey="value"
-          stroke="#2563eb"
+          stroke="#14b8a6"
           strokeWidth={3}
           dot={{ r: 4 }}
           activeDot={{ r: 6 }}

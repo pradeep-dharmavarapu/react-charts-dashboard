@@ -1,3 +1,4 @@
+import { Compass } from 'lucide-react';
 import { KpiGrid } from '../components/KpiGrid/KpiGrid';
 import { LoadingShell } from '../components/ui/LoadingShell';
 import { useKpiData } from '../hooks/useKpiData';
@@ -33,7 +34,12 @@ export function GridPage() {
     <main className="app-shell">
       <header className="page-header">
         <div>
-          <p className="eyebrow">NorthStar Analytics</p>
+          <p className="brand-kicker">
+            <span className="brand-mark" aria-hidden="true">
+              <Compass size={18} />
+            </span>
+            NorthStar Analytics
+          </p>
           <h1>Executive KPI Dashboard</h1>
           <p>Seven current-quarter KPIs with QoQ movement and five-quarter context.</p>
         </div>
