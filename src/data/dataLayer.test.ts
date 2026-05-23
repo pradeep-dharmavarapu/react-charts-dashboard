@@ -3,8 +3,10 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { getSortedQuarters } from './aggregations';
 import { safeDiv } from './growthCalculations';
-import { computeKpiValue } from './kpiConfig';
+import { computeKpiValue } from '../features/kpi/kpiConfig';
+import { normalizeDataset } from './normalizeDataset';
 import { parseCsvRows } from './parser';
+import { buildDrillDownData, buildKpiSummaries } from './transforms';
 import type { RawRow } from './types';
 
 const dataset = parseCsvRows(
@@ -55,6 +57,18 @@ describe('KPI calculations', () => {
     expect(computeKpiValue('average-deal-size', rows)).toBe(300);
     expect(computeKpiValue('new-logos', rows)).toBe(2);
     expect(computeKpiValue('win-rate', rows)).toBe(0.5);
+  });
+});
+
+describe('normalized dashboard model', () => {
+  it('builds the same summaries from raw rows and normalized rows', () => {
+    expect(buildKpiSummaries(normalizeDataset(dataset))).toEqual(buildKpiSummaries(dataset));
+  });
+
+  it('builds the same drill-down data from raw rows and normalized rows', () => {
+    expect(buildDrillDownData('bookings', normalizeDataset(dataset), 'THEATER')).toEqual(
+      buildDrillDownData('bookings', dataset, 'THEATER'),
+    );
   });
 });
 

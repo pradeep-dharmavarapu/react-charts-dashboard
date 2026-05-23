@@ -1,5 +1,6 @@
 import { ArrowDownRight, ArrowRight, ArrowUpRight } from 'lucide-react';
 import { formatPct } from '../../data/formatters';
+import styles from './DeltaBadge.module.css';
 
 interface DeltaBadgeProps {
   delta: number;
@@ -11,7 +12,8 @@ export function DeltaBadge({ delta, higherIsBetter, label = 'QoQ' }: DeltaBadgeP
   const isFlat = delta === 0;
   const isPositive = delta > 0;
   const isGood = isFlat || isPositive === higherIsBetter;
-  const className = `delta-badge ${isFlat ? 'neutral' : isGood ? 'positive' : 'negative'}`;
+  const toneClass = isFlat ? styles.neutral : isGood ? styles.positive : styles.negative;
+  const className = `${styles.badge} ${toneClass}`;
   const Icon = isFlat ? ArrowRight : isPositive ? ArrowUpRight : ArrowDownRight;
 
   return (

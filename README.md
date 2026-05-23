@@ -1,8 +1,8 @@
 # NorthStar Executive KPI Dashboard
 
-This is a single-page React + TypeScript dashboard for the NorthStar Analytics take-home brief. It loads the provided CSV in the browser, derives the seven executive KPIs from the raw rows, and lets a user click into any KPI to understand the trend and breakdown behind the number.
+This is a React + TypeScript dashboard for the NorthStar Analytics take-home brief. It loads the provided CSV in the browser, calculates the seven KPIs, and lets the user click into any KPI to see the trend and breakdown behind it.
 
-I kept the first version intentionally focused: correctness in the data layer first, then a clean executive-facing UI on top of it. The goal was to make the dashboard easy to scan, but also easy to reason about in code.
+I focused on keeping the app simple, readable, and correct. The data calculations live outside the UI, and the UI is built around the two main views from the brief: the KPI grid and the drill-down page.
 
 ## Running the App
 
@@ -11,105 +11,68 @@ npm install
 npm run dev
 ```
 
-Production build:
+Then open the local URL printed by Vite.
 
-```bash
-npm run build
-```
-
-Tests:
+To run checks:
 
 ```bash
 npm test
+npm run build
 ```
 
 ## What Is Included
 
-- A responsive KPI grid with all seven current-quarter metrics.
-- QoQ movement on each card, with compact value formatting and trend sparklines.
-- A drill-down route for each KPI at `/kpi/:kpiId`.
-- Five-quarter trend charts.
-- Breakdown by theater, product, or segment.
-- QoQ and YoY actual growth, absolute growth, and percent growth.
-- Loading, error, and no-data states.
-- Keyboard-friendly navigation back from the drill-down.
-
-## Architecture
-
-I separated the calculation work from the UI because this is the part of the assignment where small shortcuts can get expensive quickly. React components should not know how to calculate win rate or distinct new logos; they should receive already-shaped data and render it.
-
-The data layer lives under `src/data` and has no React imports:
-
-- `parser.ts` parses the CSV, normalizes values, and validates expected fields.
-- `aggregations.ts` contains reusable grouping, summing, distinct count, and quarter sorting helpers.
-- `kpiCalculations.ts` contains the actual KPI formulas.
-- `kpiConfig.ts` is the KPI registry: label, format, behavior, and calculation function.
-- `growthCalculations.ts` handles safe division and growth math.
-- `transforms.ts` builds the summary and drill-down view models consumed by the UI.
-- `formatters.ts` keeps currency, percent, and count formatting consistent.
-
-The UI sits separately under `src/components`, `src/pages`, `src/hooks`, and `src/store`. I used a small Zustand store to load the CSV once and keep the current load state, raw rows, and precomputed KPI summaries available to the app.
+- A dashboard grid with all 7 KPIs.
+- Current-quarter value for each KPI.
+- QoQ and YoY comparison context.
+- Small trend chart on each KPI card.
+- Drill-down page for each KPI.
+- Five-quarter trend view.
+- Breakdown by Theater, Product, or Segment.
+- Table with actuals, QoQ growth, QoQ growth %, YoY growth, and YoY growth %.
+- Loading, error, and empty states.
+- Basic keyboard and accessibility support.
 
 ## KPI Logic
 
-The current quarter is selected from the highest `FISCAL_QUARTER_KEY`, which resolves to `4QFY26` for the provided dataset. Quarters are always sorted by `FISCAL_QUARTER_KEY`, not by display name.
+The app uses the latest `FISCAL_QUARTER_KEY` in the CSV as the current quarter. For this dataset, that is `4QFY26`.
 
-Implemented formulas:
+Implemented KPIs:
 
-- **Bookings**: `SUM(KPI_VALUE)` where `KPI = 'Bookings'`
-- **Open Pipeline**: `SUM(KPI_VALUE)` where `KPI = 'Open Pipeline'`
-- **IQC Pipeline**: `SUM(KPI_VALUE)` where `KPI = 'IQC Pipeline'`
-- **Renewal Bookings**: `SUM(KPI_VALUE)` where `KPI = 'Renewal Bookings'`
-- **Average Deal Size**: bookings value divided by distinct won opportunities
-- **New Logos**: distinct account count where `KPI = 'Bookings'` and `NEW_LOGO_FLAG = 'Y'`
-- **Win Rate by Value**: bookings value divided by at-bats value
+- Bookings: sum of `KPI_VALUE` where `KPI = Bookings`
+- Open Pipeline: sum of `KPI_VALUE` where `KPI = Open Pipeline`
+- IQC Pipeline: sum of `KPI_VALUE` where `KPI = IQC Pipeline`
+- Renewal Bookings: sum of `KPI_VALUE` where `KPI = Renewal Bookings`
+- Average Deal Size: Bookings divided by distinct won opportunities
+- New Logos: distinct accounts where `NEW_LOGO_FLAG = Y`
+- Win Rate by Value: Bookings divided by Atbats
 
-Growth calculations use a shared `safeDiv` helper so zero denominators return `0` instead of producing `NaN` or `Infinity`.
+Growth calculations are shared so QoQ and YoY are handled consistently. If the comparison value is zero, the app returns `0` instead of showing `NaN` or `Infinity`.
+
+## Project Structure
+
+The main pieces are:
+
+- `src/data`: CSV parsing, normalization, formatting, growth calculations, and view-model transforms.
+- `src/features/kpi`: KPI definitions and formulas.
+- `src/features/dashboard`: home dashboard and KPI cards.
+- `src/features/drill-down`: drill-down page, trend, growth table, and breakdown section.
+- `src/features/dimensions`: Theater/Product/Segment toggle.
+- `src/shared`: shared charts, UI components, and hooks.
+- `src/store`: loads the CSV once and stores the normalized data.
 
 ## Library Choices
 
-- **Vite + React + TypeScript**: quick setup, fast feedback loop, and strong typing without extra framework complexity.
-- **PapaParse**: reliable CSV parsing with header handling instead of hand-rolled parsing.
-- **Recharts**: enough charting power for sparklines, trend lines, and breakdown bars without adding a heavier visualization layer.
-- **React Router**: gives each drill-down a shareable URL and normal browser back behavior.
-- **Zustand**: small, typed state layer for this app's load state and derived KPI summaries.
-- **Plain CSS**: for a take-home of this size, custom CSS kept the styling direct and easy to inspect.
+- Vite, React, and TypeScript for the app setup.
+- PapaParse for CSV parsing.
+- Recharts for the sparklines and trend chart.
+- Custom CSS bars for the horizontal breakdown chart so the labels and table alignment are easier to control.
+- Zustand for a small app-level data store.
+- CSS modules for component-level styling.
 
-## Validation and Tests
-
-The tests focus on the areas most likely to break:
-
-- all seven KPI calculations against the provided CSV
-- distinct count behavior for average deal size and new logos
-- win rate as a cross-KPI calculation
-- zero-denominator growth handling
-- fiscal quarter sorting by numeric key
-- parser validation for invalid numeric and enum fields
-
-I did not try to make the test suite exhaustive. I focused it around the data correctness risks called out in the brief.
-
-## UX Notes
-
-I aimed for an executive dashboard style: clear hierarchy, compact formatting, restrained color, and quick comparison. The home view is optimized for scanning, while the drill-down gives more context through trend, growth, and dimension contribution.
-
-For the dimension breakdown, I included a toggle for theater, product, and segment rather than adding global filters. That keeps the first version focused while still giving enough room to explore the story behind each KPI.
-
-## Tradeoffs and Next Steps
-
-If I had more time, I would add:
-
-- CSV export from drill-down tables.
-- A persisted preference for the selected drill-down dimension.
-- Month-level trend expansion using the fiscal month fields already present in the CSV.
-- Route-level code splitting for the chart-heavy drill-down view if bundle size became important.
-- A small visual regression pass across more viewport sizes.
-
-The current production build may warn about chunk size because Recharts is included in the main bundle. I left that as a tradeoff for this version because the app is small, the build is still fast, and the implementation stays straightforward.
 
 ## Deployment
 
-The app is ready to deploy on Vercel:
 
 - Build command: `npm run build`
 - Output directory: `dist`
-- SPA rewrites are configured in `vercel.json`

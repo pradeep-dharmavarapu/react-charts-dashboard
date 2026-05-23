@@ -1,0 +1,17 @@
+.shell {
+  width: min(1480px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0;
+}
+
+.detailShell {
+  width: min(1480px, calc(100% - 32px));
+}
+
+@media (max-width: 560px) {
+  .shell,
+  .detailShell {
+    width: min(100% - 20px, 1240px);
+    padding: 20px 0;
+  }
+}

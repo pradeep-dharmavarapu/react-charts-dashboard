@@ -1,0 +1,70 @@
+.meterList {
+  --bar-end-label-width: 72px;
+  display: grid;
+  gap: 26px;
+  padding: 20px 0 18px;
+}
+
+.meterRow {
+  align-items: center;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(84px, 0.12fr) minmax(0, 1fr);
+}
+
+.meterLabel {
+  color: var(--color-text-muted);
+  font-size: 0.82rem;
+  font-weight: 760;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meterPlot {
+  height: 28px;
+  position: relative;
+}
+
+.meterFill {
+  background: var(--color-data-primary-strong);
+  border-radius: 4px;
+  display: block;
+  height: 100%;
+  max-width: calc(100% - var(--bar-end-label-width));
+}
+
+.meterValue {
+  color: var(--color-text-muted);
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 760;
+  left: min(calc(var(--bar-width) + 8px), calc(100% - var(--bar-end-label-width) + 8px));
+  line-height: 1;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+}
+
+@media (max-width: 560px) {
+  .meterList {
+    --bar-end-label-width: 58px;
+    gap: 20px;
+  }
+
+  .meterRow {
+    gap: 8px;
+    grid-template-columns: minmax(72px, 0.24fr) minmax(0, 1fr);
+  }
+
+  .meterPlot {
+    height: 24px;
+  }
+
+  .meterLabel,
+  .meterValue {
+    font-size: 0.78rem;
+  }
+}

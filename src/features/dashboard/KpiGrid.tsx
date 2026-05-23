@@ -1,5 +1,6 @@
 import type { KpiSummary } from '../../data/types';
-import { KpiCard } from '../KpiCard/KpiCard';
+import { KpiCard } from './KpiCard';
+import styles from './KpiGrid.module.css';
 
 interface KpiGridProps {
   summaries: KpiSummary[];
@@ -7,7 +8,7 @@ interface KpiGridProps {
 
 export function KpiGrid({ summaries }: KpiGridProps) {
   return (
-    <section className="kpi-grid" aria-label="Executive KPI cards">
+    <section className={styles.grid} aria-label="Executive KPI cards">
       {summaries.map((summary) => (
         <KpiCard key={summary.id} summary={summary} />
       ))}

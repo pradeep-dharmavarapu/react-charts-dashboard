@@ -8,7 +8,7 @@ import {
   calculateRenewalBookings,
   calculateWinRateByValue,
 } from './kpiCalculations';
-import type { KpiDefinition, KpiId } from './types';
+import type { KpiDefinition, KpiId } from '../../data/types';
 
 export interface KpiConfig extends KpiDefinition {
   calculate: KpiCalculator;

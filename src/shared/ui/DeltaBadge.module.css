@@ -1,0 +1,30 @@
+.badge {
+  align-items: center;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-size: 0.78rem;
+  font-weight: 800;
+  gap: 4px;
+  padding: 6px 9px;
+  white-space: nowrap;
+}
+
+.positive {
+  background: var(--color-success-soft);
+  border-color: var(--color-success-border);
+  color: var(--color-success);
+}
+
+.negative {
+  background: var(--color-danger-soft);
+  border-color: var(--color-danger-border);
+  color: var(--color-danger);
+}
+
+.neutral {
+  background: var(--surface-card-subtle);
+  border-color: var(--color-border);
+  color: var(--color-text-muted);
+}

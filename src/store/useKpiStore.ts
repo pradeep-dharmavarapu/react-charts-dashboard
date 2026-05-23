@@ -1,7 +1,8 @@
 import { create } from 'zustand';
 import { loadCsvRows } from '../data/loader';
+import { normalizeDataset } from '../data/normalizeDataset';
 import { buildKpiSummaries } from '../data/transforms';
-import type { KpiSummary, RawRow } from '../data/types';
+import type { KpiSummary, NormalizedKpiDataset, RawRow } from '../data/types';
 
 type LoadStatus = 'idle' | 'loading' | 'success' | 'error';
 
@@ -9,6 +10,7 @@ interface KpiStore {
   status: LoadStatus;
   error: string | null;
   rawRows: RawRow[];
+  dataset: NormalizedKpiDataset | null;
   summaries: KpiSummary[];
   loadData: () => Promise<void>;
 }
@@ -17,6 +19,7 @@ export const useKpiStore = create<KpiStore>((set, get) => ({
   status: 'idle',
   error: null,
   rawRows: [],
+  dataset: null,
   summaries: [],
   loadData: async () => {
     if (get().status === 'loading' || get().status === 'success') return;
@@ -25,9 +28,11 @@ export const useKpiStore = create<KpiStore>((set, get) => ({
 
     try {
       const rawRows = await loadCsvRows();
+      const dataset = normalizeDataset(rawRows);
       set({
         rawRows,
-        summaries: buildKpiSummaries(rawRows),
+        dataset,
+        summaries: buildKpiSummaries(dataset),
         status: 'success',
       });
     } catch (error) {

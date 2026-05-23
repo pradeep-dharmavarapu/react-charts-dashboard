@@ -17,6 +17,11 @@ export type KpiId =
 export type SymbolKind = '$' | '#' | '%';
 export type DimensionKey = 'THEATER' | 'PRODUCT' | 'SEGMENT';
 
+export interface QuarterMeta {
+  key: number;
+  name: string;
+}
+
 export interface RawRow {
   KPI: SourceKpi;
   KPI_VALUE: number;
@@ -79,4 +84,16 @@ export interface DrillDownData {
   timeSeries: Array<{ quarter: string; value: number }>;
   comparison: ComparisonRow[];
   breakdown: BreakdownRow[];
+}
+
+export interface NormalizedKpiDataset {
+  rawRows: RawRow[];
+  quarters: QuarterMeta[];
+  rowsByQuarter: Map<number, RawRow[]>;
+  currentQuarter: QuarterMeta | null;
+  priorQuarter: QuarterMeta | null;
+  priorYearQuarterKey: number | null;
+  currentRows: RawRow[];
+  priorQuarterRows: RawRow[];
+  priorYearRows: RawRow[];
 }

@@ -6,14 +6,15 @@ import type {
   KpiDefinition,
   KpiId,
   KpiSummary,
+  NormalizedKpiDataset,
   RawRow,
 } from './types';
-import { getSortedQuarters, groupRowsByQuarter } from './aggregations';
-import { buildComparisonRow, calculateGrowth, getPriorYearQuarterKey } from './growthCalculations';
-import { computeKpiValue, KPI_CONFIG, KPI_DEFINITIONS, isKpiId } from './kpiConfig';
+import { calculateGrowth, buildComparisonRow } from './growthCalculations';
+import { normalizeDataset } from './normalizeDataset';
+import { computeKpiValue, KPI_CONFIG, KPI_DEFINITIONS, isKpiId } from '../features/kpi/kpiConfig';
 
-export { computeKpiValue } from './kpiConfig';
-export { KPI_DEFINITIONS, isKpiId } from './kpiConfig';
+export { computeKpiValue } from '../features/kpi/kpiConfig';
+export { KPI_DEFINITIONS, isKpiId } from '../features/kpi/kpiConfig';
 
 const buildTrend = (
   kpiId: KpiId,
@@ -48,22 +49,15 @@ const buildBreakdown = (
   priorYearRows: RawRow[],
   dimension: DimensionKey,
 ): BreakdownRow[] => {
-  const dimensionValues = new Set(currentRows.map((row) => row[dimension]));
+  const currentGroups = groupRowsByDimension(currentRows, dimension);
+  const priorQuarterGroups = groupRowsByDimension(priorQuarterRows, dimension);
+  const priorYearGroups = groupRowsByDimension(priorYearRows, dimension);
 
-  return Array.from(dimensionValues)
+  return Array.from(currentGroups.keys())
     .map((name) => {
-      const currentValue = computeKpiValue(
-        kpiId,
-        currentRows.filter((row) => row[dimension] === name),
-      );
-      const priorValue = computeKpiValue(
-        kpiId,
-        priorQuarterRows.filter((row) => row[dimension] === name),
-      );
-      const priorYearValue = computeKpiValue(
-        kpiId,
-        priorYearRows.filter((row) => row[dimension] === name),
-      );
+      const currentValue = computeKpiValue(kpiId, currentGroups.get(name) ?? []);
+      const priorValue = computeKpiValue(kpiId, priorQuarterGroups.get(name) ?? []);
+      const priorYearValue = computeKpiValue(kpiId, priorYearGroups.get(name) ?? []);
       const qoqGrowth = calculateGrowth(currentValue, priorValue);
       const yoyGrowth = calculateGrowth(currentValue, priorYearValue);
 
@@ -79,17 +73,36 @@ const buildBreakdown = (
     .sort((a, b) => b.value - a.value);
 };
 
-export const buildKpiSummaries = (rows: RawRow[]): KpiSummary[] => {
-  const quarters = getSortedQuarters(rows);
-  const rowsByQuarter = groupRowsByQuarter(rows);
-  const currentQuarter = quarters.at(-1);
-  const priorQuarter = quarters.at(-2);
+const groupRowsByDimension = (
+  rows: RawRow[],
+  dimension: DimensionKey,
+): Map<string, RawRow[]> => {
+  const groups = new Map<string, RawRow[]>();
+
+  rows.forEach((row) => {
+    const dimensionRows = groups.get(row[dimension]) ?? [];
+    dimensionRows.push(row);
+    groups.set(row[dimension], dimensionRows);
+  });
+
+  return groups;
+};
+
+const asNormalizedDataset = (dataset: NormalizedKpiDataset | RawRow[]): NormalizedKpiDataset =>
+  Array.isArray(dataset) ? normalizeDataset(dataset) : dataset;
+
+export const buildKpiSummaries = (dataset: NormalizedKpiDataset | RawRow[]): KpiSummary[] => {
+  const {
+    quarters,
+    rowsByQuarter,
+    currentQuarter,
+    priorQuarter,
+    currentRows,
+    priorQuarterRows,
+    priorYearRows,
+  } = asNormalizedDataset(dataset);
 
   if (!currentQuarter || !priorQuarter) return [];
-
-  const currentRows = rowsByQuarter.get(currentQuarter.key) ?? [];
-  const priorQuarterRows = rowsByQuarter.get(priorQuarter.key) ?? [];
-  const priorYearRows = rowsByQuarter.get(getPriorYearQuarterKey(currentQuarter.key)) ?? [];
 
   return KPI_DEFINITIONS.map((definition) => {
     const calculate = KPI_CONFIG[definition.id].calculate;
@@ -115,20 +128,21 @@ export const buildKpiSummaries = (rows: RawRow[]): KpiSummary[] => {
 
 export const buildDrillDownData = (
   kpiId: KpiId,
-  rows: RawRow[],
+  dataset: NormalizedKpiDataset | RawRow[],
   dimension: DimensionKey,
 ): DrillDownData | null => {
   const definition: KpiDefinition | undefined = KPI_CONFIG[kpiId];
-  const quarters = getSortedQuarters(rows);
-  const rowsByQuarter = groupRowsByQuarter(rows);
-  const currentQuarter = quarters.at(-1);
-  const priorQuarter = quarters.at(-2);
+  const {
+    quarters,
+    rowsByQuarter,
+    currentQuarter,
+    priorQuarter,
+    currentRows,
+    priorQuarterRows,
+    priorYearRows,
+  } = asNormalizedDataset(dataset);
 
   if (!definition || !currentQuarter || !priorQuarter) return null;
-
-  const currentRows = rowsByQuarter.get(currentQuarter.key) ?? [];
-  const priorQuarterRows = rowsByQuarter.get(priorQuarter.key) ?? [];
-  const priorYearRows = rowsByQuarter.get(getPriorYearQuarterKey(currentQuarter.key)) ?? [];
 
   return {
     definition,
