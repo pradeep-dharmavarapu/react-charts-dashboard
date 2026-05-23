@@ -1,6 +1,6 @@
-import { distinctCount, filterByKpi, sumKpi } from './aggregations';
-import { safeDiv } from './growthCalculations';
-import type { RawRow } from './types';
+import { distinctCount, filterByKpi, sumKpi } from '../../data/aggregations';
+import { safeDiv } from '../../data/growthCalculations';
+import type { RawRow } from '../../data/types';
 
 export type KpiCalculator = (rows: RawRow[]) => number;
 

@@ -41,14 +41,22 @@ I separated the calculation work from the UI because this is the part of the ass
 The data layer lives under `src/data` and has no React imports:
 
 - `parser.ts` parses the CSV, normalizes values, and validates expected fields.
+- `normalizeDataset.ts` builds the reusable quarter and row-group model once after load.
 - `aggregations.ts` contains reusable grouping, summing, distinct count, and quarter sorting helpers.
-- `kpiCalculations.ts` contains the actual KPI formulas.
-- `kpiConfig.ts` is the KPI registry: label, format, behavior, and calculation function.
 - `growthCalculations.ts` handles safe division and growth math.
 - `transforms.ts` builds the summary and drill-down view models consumed by the UI.
 - `formatters.ts` keeps currency, percent, and count formatting consistent.
 
-The UI sits separately under `src/components`, `src/pages`, `src/hooks`, and `src/store`. I used a small Zustand store to load the CSV once and keep the current load state, raw rows, and precomputed KPI summaries available to the app.
+Product-facing code is grouped by feature:
+
+- `src/features/kpi` owns KPI formulas and the KPI registry.
+- `src/features/dashboard` owns the dashboard route view, grid, and KPI cards.
+- `src/features/drill-down` owns the drill-down route view and its focused panels.
+- `src/features/dimensions` owns dimension metadata and controls.
+- `src/shared/ui` and `src/shared/charts` hold reusable presentation primitives.
+- `src/store` loads the CSV once, stores the normalized dataset, and exposes precomputed KPI summaries.
+
+Routes are lazy-loaded from `src/app/App.tsx` so feature code and chart-heavy dependencies do not all sit on the initial bootstrap path.
 
 ## KPI Logic
 
@@ -101,10 +109,7 @@ If I had more time, I would add:
 - CSV export from drill-down tables.
 - A persisted preference for the selected drill-down dimension.
 - Month-level trend expansion using the fiscal month fields already present in the CSV.
-- Route-level code splitting for the chart-heavy drill-down view if bundle size became important.
 - A small visual regression pass across more viewport sizes.
-
-The current production build may warn about chunk size because Recharts is included in the main bundle. I left that as a tradeoff for this version because the app is small, the build is still fast, and the implementation stays straightforward.
 
 ## Deployment
 

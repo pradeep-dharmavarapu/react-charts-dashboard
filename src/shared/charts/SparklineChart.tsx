@@ -8,6 +8,7 @@ import {
 import type { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 import { formatValue } from '../../data/formatters';
 import type { SymbolKind } from '../../data/types';
+import styles from './SparklineChart.module.css';
 
 interface SparklineChartProps {
   data: Array<{ quarter: string; value: number }>;
@@ -18,7 +19,7 @@ const SparklineTooltip = ({ active, payload, label, symbol }: TooltipProps<Value
   if (!active || !payload?.length) return null;
 
   return (
-    <div className="chart-tooltip">
+    <div className={styles.tooltip}>
       <span>{label}</span>
       <strong>{formatValue(Number(payload[0].value), symbol)}</strong>
     </div>

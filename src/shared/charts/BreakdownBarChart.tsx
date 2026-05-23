@@ -9,6 +9,7 @@ import {
 } from 'recharts';
 import { formatValue } from '../../data/formatters';
 import type { BreakdownRow, SymbolKind } from '../../data/types';
+import { chartTheme } from './chartTheme';
 
 interface BreakdownBarChartProps {
   data: BreakdownRow[];
@@ -19,14 +20,19 @@ export function BreakdownBarChart({ data, symbol }: BreakdownBarChartProps) {
   return (
     <ResponsiveContainer width="100%" height={260}>
       <BarChart data={data} margin={{ top: 8, right: 20, bottom: 8, left: 0 }}>
-        <CartesianGrid strokeDasharray="4 4" vertical={false} />
+        <CartesianGrid strokeDasharray={chartTheme.gridStrokeDasharray} vertical={false} />
         <XAxis dataKey="name" tickLine={false} axisLine={false} />
-        <YAxis tickLine={false} axisLine={false} tickFormatter={(value) => formatValue(Number(value), symbol)} width={72} />
+        <YAxis
+          tickLine={false}
+          axisLine={false}
+          tickFormatter={(value) => formatValue(Number(value), symbol)}
+          width={chartTheme.axisWidth}
+        />
         <Tooltip
           formatter={(value) => [formatValue(Number(value), symbol), 'Actual']}
-          contentStyle={{ borderRadius: 8, border: '1px solid #d8dee8' }}
+          contentStyle={{ borderRadius: chartTheme.tooltipRadius, border: chartTheme.tooltipBorder }}
         />
-        <Bar dataKey="value" fill="#0f766e" radius={[5, 5, 0, 0]} isAnimationActive={false} />
+        <Bar dataKey="value" fill={chartTheme.breakdownFill} radius={[5, 5, 0, 0]} isAnimationActive={false} />
       </BarChart>
     </ResponsiveContainer>
   );
