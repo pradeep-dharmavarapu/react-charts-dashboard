@@ -1,15 +1,7 @@
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
+import type { CSSProperties } from 'react';
 import { formatValue } from '../../data/formatters';
 import type { BreakdownRow, SymbolKind } from '../../data/types';
-import { chartTheme } from './chartTheme';
+import styles from './BreakdownBarChart.module.css';
 
 interface BreakdownBarChartProps {
   data: BreakdownRow[];
@@ -17,23 +9,24 @@ interface BreakdownBarChartProps {
 }
 
 export function BreakdownBarChart({ data, symbol }: BreakdownBarChartProps) {
+  const maxValue = Math.max(...data.map((row) => row.value), 0);
+
   return (
-    <ResponsiveContainer width="100%" height={260}>
-      <BarChart data={data} margin={{ top: 8, right: 20, bottom: 8, left: 0 }}>
-        <CartesianGrid strokeDasharray={chartTheme.gridStrokeDasharray} vertical={false} />
-        <XAxis dataKey="name" tickLine={false} axisLine={false} />
-        <YAxis
-          tickLine={false}
-          axisLine={false}
-          tickFormatter={(value) => formatValue(Number(value), symbol)}
-          width={chartTheme.axisWidth}
-        />
-        <Tooltip
-          formatter={(value) => [formatValue(Number(value), symbol), 'Actual']}
-          contentStyle={{ borderRadius: chartTheme.tooltipRadius, border: chartTheme.tooltipBorder }}
-        />
-        <Bar dataKey="value" fill={chartTheme.breakdownFill} radius={[5, 5, 0, 0]} isAnimationActive={false} />
-      </BarChart>
-    </ResponsiveContainer>
+    <div className={styles.meterList}>
+      {data.map((row) => {
+        const width = maxValue > 0 ? `${Math.max((row.value / maxValue) * 100, 2)}%` : '0%';
+        const rowStyle = { '--bar-width': width } as CSSProperties;
+
+        return (
+          <div className={styles.meterRow} key={row.name} style={rowStyle}>
+            <span className={styles.meterLabel}>{row.name}</span>
+            <div className={styles.meterPlot}>
+              <span className={styles.meterFill} style={{ width }} />
+              <span className={styles.meterValue}>{formatValue(row.value, symbol)}</span>
+            </div>
+          </div>
+        );
+      })}
+    </div>
   );
 }

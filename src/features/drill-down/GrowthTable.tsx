@@ -9,7 +9,7 @@ interface GrowthTableProps {
 
 export function GrowthTable({ comparison, symbol }: GrowthTableProps) {
   return (
-    <div className={styles.panel}>
+    <div className={`${styles.panel} ${styles.growthPanel}`}>
       <div className={styles.panelHeading}>
         <div>
           <h2>Growth Table</h2>
@@ -28,14 +28,21 @@ export function GrowthTable({ comparison, symbol }: GrowthTableProps) {
             </tr>
           </thead>
           <tbody>
-            {comparison.map((row) => (
-              <tr key={row.label}>
-                <td>{row.label}</td>
-                <td>{formatValue(row.currentValue, symbol)}</td>
-                <td>{formatSignedValue(row.absoluteGrowth, symbol)}</td>
-                <td>{formatPct(row.percentGrowth)}</td>
-              </tr>
-            ))}
+            {comparison.map((row) => {
+              const growthClass = row.absoluteGrowth >= 0 ? styles.positiveCell : styles.negativeCell;
+              const percentClass = row.percentGrowth >= 0 ? styles.positiveCell : styles.negativeCell;
+
+              return (
+                <tr key={row.label}>
+                  <td>{row.label}</td>
+                  <td className={styles.numericCell}>{formatValue(row.currentValue, symbol)}</td>
+                  <td className={`${styles.numericCell} ${growthClass}`}>
+                    {formatSignedValue(row.absoluteGrowth, symbol)}
+                  </td>
+                  <td className={`${styles.numericCell} ${percentClass}`}>{formatPct(row.percentGrowth)}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

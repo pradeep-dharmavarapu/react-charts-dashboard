@@ -1,5 +1,5 @@
 .control {
-  background: #eef2f6;
+  background: var(--surface-muted);
   border: 1px solid var(--color-border-strong);
   border-radius: var(--radius-md);
   display: inline-flex;
@@ -10,7 +10,7 @@
   background: transparent;
   border: 0;
   border-radius: 6px;
-  color: #475467;
+  color: var(--color-text-muted);
   cursor: pointer;
   font-size: 0.88rem;
   font-weight: 800;
@@ -19,14 +19,14 @@
 }
 
 .button:focus-visible {
-  outline: 3px solid rgb(37 99 235 / 35%);
+  outline: 3px solid var(--color-focus-ring);
   outline-offset: 3px;
 }
 
 .active {
   background: var(--surface-card);
-  box-shadow: 0 4px 12px rgb(31 41 55 / 12%);
-  color: #172033;
+  box-shadow: 0 4px 12px rgb(15 23 42 / 10%);
+  color: var(--color-text-strong);
 }
 
 @media (max-width: 560px) {

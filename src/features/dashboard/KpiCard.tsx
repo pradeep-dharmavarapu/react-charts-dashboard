@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { formatSignedValue, formatValue } from '../../data/formatters';
+import { formatPct, formatSignedValue, formatValue } from '../../data/formatters';
 import type { KpiSummary } from '../../data/types';
 import { SparklineChart } from '../../shared/charts/SparklineChart';
 import { DeltaBadge } from '../../shared/ui/DeltaBadge';
@@ -25,6 +25,17 @@ export function KpiCard({ summary }: KpiCardProps) {
           <strong>{formatValue(summary.currentValue, summary.symbol)}</strong>
           <span>{formatSignedValue(summary.qoqDelta, summary.symbol)} vs prior quarter</span>
         </div>
+
+        <dl className={styles.comparisonList}>
+          <div>
+            <dt>Prior quarter</dt>
+            <dd>{formatValue(summary.priorQtrValue, summary.symbol)}</dd>
+          </div>
+          <div>
+            <dt>YoY</dt>
+            <dd>{formatPct(summary.yoyDeltaPct)}</dd>
+          </div>
+        </dl>
 
         <div className={styles.sparkline} aria-hidden="true">
           <SparklineChart data={summary.trend} symbol={summary.symbol} />

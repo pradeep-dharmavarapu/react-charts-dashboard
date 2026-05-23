@@ -20,11 +20,12 @@ export function TrendLineChart({ data, symbol }: TrendLineChartProps) {
   return (
     <ResponsiveContainer width="100%" height={280}>
       <LineChart data={data} margin={{ top: 8, right: 20, bottom: 8, left: 0 }}>
-        <CartesianGrid strokeDasharray={chartTheme.gridStrokeDasharray} vertical={false} />
-        <XAxis dataKey="quarter" tickLine={false} axisLine={false} />
+        <CartesianGrid stroke={chartTheme.gridStroke} strokeDasharray={chartTheme.gridStrokeDasharray} vertical={false} />
+        <XAxis dataKey="quarter" tickLine={false} axisLine={false} tick={{ fill: chartTheme.axisStroke }} />
         <YAxis
           tickLine={false}
           axisLine={false}
+          tick={{ fill: chartTheme.axisStroke }}
           tickFormatter={(value) => formatValue(Number(value), symbol)}
           width={chartTheme.axisWidth}
         />

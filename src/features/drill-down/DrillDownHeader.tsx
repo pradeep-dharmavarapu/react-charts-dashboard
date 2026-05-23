@@ -1,6 +1,6 @@
 import { ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { formatSignedValue, formatValue } from '../../data/formatters';
+import { formatPct, formatSignedValue, formatValue } from '../../data/formatters';
 import type { DrillDownData } from '../../data/types';
 import { useFocusOnMount } from '../../shared/hooks/useFocusOnMount';
 import { DeltaBadge } from '../../shared/ui/DeltaBadge';
@@ -15,6 +15,13 @@ export function DrillDownHeader({ data }: DrillDownHeaderProps) {
   const currentValue = data.comparison[0]?.currentValue ?? 0;
   const qoq = data.comparison.find((row) => row.label === 'QoQ');
   const yoy = data.comparison.find((row) => row.label === 'YoY');
+  const topContributor = data.breakdown[0];
+  const qoqDirection = qoq && qoq.absoluteGrowth >= 0 ? 'up' : 'down';
+  const insight = qoq
+    ? `${data.definition.label} is ${qoqDirection} ${formatPct(Math.abs(qoq.percentGrowth))} QoQ in ${data.currentQuarterName}${
+        topContributor ? `, led by ${topContributor.name}` : ''
+      }.`
+    : `${data.definition.label} performance for ${data.currentQuarterName}.`;
 
   return (
     <section className={styles.header} aria-labelledby="detail-title">
@@ -48,6 +55,8 @@ export function DrillDownHeader({ data }: DrillDownHeaderProps) {
           </div>
         )}
       </div>
+
+      <p className={styles.insight}>{insight}</p>
     </section>
   );
 }

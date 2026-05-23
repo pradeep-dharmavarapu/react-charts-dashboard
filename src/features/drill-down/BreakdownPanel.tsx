@@ -19,6 +19,7 @@ export function BreakdownPanel({
   symbol,
 }: BreakdownPanelProps) {
   const dimensionLabel = DIMENSION_LABELS[dimension];
+  const topContributor = breakdown[0];
 
   return (
     <div className={`${styles.panel} ${styles.panelFull}`}>
@@ -29,7 +30,22 @@ export function BreakdownPanel({
         </div>
         <DimensionToggle value={dimension} onChange={onDimensionChange} />
       </div>
-      <div role="img" aria-label={`Current-quarter contribution chart by ${dimensionLabel}`}>
+      {topContributor && (
+        <div className={styles.contributorCallout}>
+          <span>Largest contributor</span>
+          <strong>{topContributor.name}</strong>
+          <p>
+            {formatValue(topContributor.value, symbol)} in current-quarter actuals,
+            {' '}
+            {formatSignedValue(topContributor.absoluteGrowth, symbol)} QoQ.
+          </p>
+        </div>
+      )}
+      <div
+        className={styles.breakdownChart}
+        role="img"
+        aria-label={`Current-quarter contribution chart by ${dimensionLabel}`}
+      >
         <BreakdownBarChart data={breakdown} symbol={symbol} />
       </div>
       <div className={styles.tableWrap}>

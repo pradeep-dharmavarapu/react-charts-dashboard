@@ -21,7 +21,7 @@
 }
 
 .errorState {
-  border-color: #fecdca;
+  border-color: var(--color-danger-border);
 }
 
 .spinner {
@@ -48,7 +48,7 @@
   align-items: center;
   border-radius: var(--radius-md);
   cursor: pointer;
-  color: #075985;
+  color: var(--color-accent-strong);
   display: inline-flex;
   font-weight: 800;
   gap: 8px;
@@ -57,13 +57,13 @@
 }
 
 .primaryButton {
-  background: #e0f2fe;
-  border: 1px solid #bae6fd;
+  background: var(--color-accent-soft);
+  border: 1px solid var(--color-border-strong);
 }
 
 .primaryButton:focus-visible,
 .primaryLink:focus-visible {
-  outline: 3px solid rgb(37 99 235 / 35%);
+  outline: 3px solid var(--color-focus-ring);
   outline-offset: 3px;
 }
 

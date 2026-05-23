@@ -5,7 +5,7 @@
 }
 
 .detailShell {
-  width: min(1240px, calc(100% - 32px));
+  width: min(1480px, calc(100% - 32px));
 }
 
 @media (max-width: 560px) {

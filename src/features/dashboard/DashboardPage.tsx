@@ -4,11 +4,12 @@ import { LoadingShell } from '../../shared/ui/LoadingShell';
 import shellStyles from '../../shared/ui/Shell.module.css';
 import { StateShell } from '../../shared/ui/StateShell';
 import stateStyles from '../../shared/ui/StateShell.module.css';
+import { DashboardSummary } from './DashboardSummary';
 import { KpiGrid } from './KpiGrid';
 import styles from './DashboardPage.module.css';
 
 export function DashboardPage() {
-  const { status, error, summaries, loadData } = useKpiData();
+  const { status, error, dataset, summaries, loadData } = useKpiData();
 
   if (status === 'loading' || status === 'idle') return <LoadingShell />;
 
@@ -47,9 +48,10 @@ export function DashboardPage() {
             NorthStar Analytics
           </p>
           <h1>Executive KPI Dashboard</h1>
-          <p>Seven current-quarter KPIs with QoQ movement and five-quarter context.</p>
+          <p>Current-quarter health, movement, and drill-down context for the executive KPI set.</p>
         </div>
       </header>
+      <DashboardSummary dataset={dataset} summaries={summaries} />
       <KpiGrid summaries={summaries} />
     </main>
   );

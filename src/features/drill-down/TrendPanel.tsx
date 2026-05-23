@@ -9,7 +9,7 @@ interface TrendPanelProps {
 
 export function TrendPanel({ timeSeries, symbol }: TrendPanelProps) {
   return (
-    <div className={styles.panel}>
+    <div className={`${styles.panel} ${styles.trendPanel}`}>
       <div className={styles.panelHeading}>
         <div>
           <h2>Quarterly Trend</h2>
